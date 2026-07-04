@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'shortener',
     'rest_framework',
     'analytics',
-    'drf_yasg',
+    
 ]
 
 MIDDLEWARE = [
@@ -55,15 +55,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'url_shortener.urls'
 
-REST_FRAMEWORK = {
-    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.openapi.AutoSchema',
-}
-SPECTACULAR_SETTINGS = {
-    'TITLE': 'URL Shortener & Analytics API',
-    'DESCRIPTION': 'API for generating short links and tracking traffic.',
-    'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': False,
-}
+
 
 TEMPLATES = [
     {

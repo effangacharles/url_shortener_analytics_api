@@ -8,7 +8,7 @@ A Django-based URL shortening service with a REST API and basic click analytics.
 - Redirect short links to their original destinations
 - Track basic click analytics by browser, device, and referrer
 - Expose API endpoints for URL creation and analytics
-- Provide Swagger/OpenAPI documentation
+
 
 ## Tech Stack
 
@@ -88,4 +88,8 @@ A Django-based URL shortening service with a REST API and basic click analytics.
    ```
 2. Use the returned short URL to redirect to the original destination.
 3. View analytics using the analytics endpoint.
+
+git add.
+git commit -m "my first commit"
+git 
 
