@@ -1,0 +1,87 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard</title>
+    <link rel="stylesheet" href="{% static 'analytics/style.css' %}">
+</head>
+<body>
+    <main class="dashboard">
+        <section class="hero">
+            <div>
+                <p class="eyebrow">Analytics</p>
+                <h1>Analytics Dashboard</h1>
+                <p class="subtitle">Track how visitors reach and use your shortened link.</p>
+            </div>
+            <a class="back-link" href="/">Back to home</a>
+        </section>
+
+        <section class="summary-grid">
+            <article class="card highlight">
+                <h2>Total Clicks</h2>
+                <div class="value">{{ total_clicks }}</div>
+                <p>Visitors who followed this short link.</p>
+            </article>
+            <article class="card">
+                <h2>Short Code</h2>
+                <div class="value small">{{ url.short_code }}</div>
+                <p>{{ url.long_url }}</p>
+            </article>
+        </section>
+
+        <section class="grid">
+            <article class="card">
+                <h2>Browsers</h2>
+                <ul>
+                    {% for browser, count in browsers.items %}
+                        <li><span>{{ browser }}</span><strong>{{ count }}</strong></li>
+                    {% empty %}
+                        <li>No browser data yet.</li>
+                    {% endfor %}
+                </ul>
+            </article>
+
+            <article class="card">
+                <h2>Devices</h2>
+                <ul>
+                    {% for device, count in devices.items %}
+                        <li><span>{{ device }}</span><strong>{{ count }}</strong></li>
+                    {% empty %}
+                        <li>No device data yet.</li>
+                    {% endfor %}
+                </ul>
+            </article>
+        </section>
+
+        <section class="card">
+            <h2>Recent Clicks</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Browser</th>
+                        <th>Device</th>
+                        <th>Referrer</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for click in recent_clicks %}
+                        <tr>
+                            <td>{{ click.clicked_at }}</td>
+                            <td>{{ click.browser }}</td>
+                            <td>{{ click.device_type }}</td>
+                            <td>{{ click.referrer }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="4">No clicks recorded yet.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    </main>
+</body>
+</html>

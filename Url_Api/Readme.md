@@ -1,95 +1,93 @@
-# URL Shortener API
+# URL Shortener & Analytics
 
-A Django-based URL shortening service with a REST API and basic click analytics. It allows users to create short links, redirect them to their original destinations, and view simple traffic statistics.
+Small Django project that provides a REST API for shortening URLs, a redirect endpoint, and click analytics tracking. Includes a lightweight demo UI and Swagger/OpenAPI docs for quick inspection.
 
-## Features
+## Key Features
 
-- Create short URLs from long URLs
-- Redirect short links to their original destinations
-- Track basic click analytics by browser, device, and referrer
-- Expose API endpoints for URL creation and analytics
+- Create short URLs via a JSON API
+- Redirect short codes to their original long URLs
+- Track clicks (browser, device type, referrer)
+- View aggregated analytics via API or demo pages
 
+## Quick Setup
 
-## Tech Stack
+1. Create and activate a Python virtualenv
+```bash
+python -m venv env
+env\Scripts\activate
+```
+2. Install required packages
+```bash
+pip install django djangorestframework ,drf-yasg
+```
+3. Apply migrations and run the server
+```bash
+python manage.py migrate
+python manage.py runserver
+```
 
-- Django
-- Django REST Framework
-- SQLite
+Open the demo at: http://127.0.0.1:8000/
 
-## Project Structure
+## Routes / Endpoints
 
-- shortener/: URL creation, shortening logic, and redirect handling
-- analytics/: Click analytics storage and reporting
-- url_shortener/: Django project settings and root URL configuration
+- POST `/shortener/create_urls/` — Create a short URL (JSON input `{ "long_url": "https://..." }`).
+- GET `/<short_code>/` — Redirect to the original URL and record a click.
+- GET `/analytics/urls/<short_code>/` — Analytics JSON for a short code (total clicks, browser/device breakdown).
+- Demo pages: `/` (home), `/shortener/analytics-report/` (full report), `/analytics/` (analytics index).
+- Swagger UI: `/swagger/` — OpenAPI interactive documentaion
+- Admin: `/admin/` — Django admin to inspect `URL` and `ClickAnalytics` records.
 
-## Installation
+Request → Response Cycle (detailed)
 
-1. Clone the repository
-2. Create and activate a virtual environment
-   ```bash
-   python -m venv env
-   env\Scripts\activate
-   ```
-3. Install dependencies
-   ```bash
-   pip install django, djangorestframework ,drf-yasg
-   ```
-4. Apply database migrations
-   ```bash
-   python manage.py migrate
-   ```
-5. Start the development server
-   ```bash
-   python manage.py runserver
-   ```
+1) Create URL (API)
+- Client: POST `/shortener/create_urls/` with `{"long_url": "https://google.com"}`.
+- `shortener.serializers.URLSerializer` validates the input and prepares the model data.
+- `shortener.models.URL`: a `pre_save` signal (`auto_generate_short_code`) runs `shortener.utils.create_unique_slug()` to generate `short_code` if missing.
+- On save, serializer returns JSON containing `short_code` and a `short_url` built from the request.
 
-## API Endpoints
+2) Redirect (user clicks short URL)
+- Client: GET `/{short_code}/`.
+- `shortener.views.URLRedirectView` finds the `URL` object (404 if not found), parses headers (`User-Agent`, `Referer`) to extract `browser`, `device_type`, and `referrer`.
+- A `ClickAnalytics` record is created with this metadata and timestamp.
+- View responds with a redirect (HTTP 302) to the `long_url`.
 
-### Create a short URL
+3) Analytics API
+- `analytics.views.URLAnalyticsAPIView` aggregates `ClickAnalytics` rows for the given `short_code` and returns a JSON summary: `total_clicks`, `metrics` (browsers/devices), plus `short_code` and `long_url`.
 
-- Method: POST
-- Endpoint: /shortener/create_urls/
-- Example request:
-  ```json
-  {
-    "long_url": "https://google.com"
-  }
-  ```
+4) Demo / Reports (HTML)
+- Views `AnalyticsDashboardView` and `AnalyticsReportView` prepare context for templates (`templates/analytics_dashboard.html`, `templates/analytics_report.html`).
+- The templates render aggregated `link_counts` (click totals per long URL), full click lists, and summary statistics. Static CSS/JS are in `static/`.
 
-- Example response:
-  ```json
-  {
-    "id": 1,
-    "long_url": "https://google.com",
-    "short_code": "abc123",
-    "short_url": "http://127.0.0.1:8000/abc123/",
-    "created_at": "2026-07-04T00:00:00Z"
-  }
-  ```
+Models / Serializers / Views mapping
 
-### Redirect to a long URL
+- Models:
+  - `shortener.models.URL` — fields: `long_url`, `short_code`, `created_at`.
+  - `analytics.models.ClickAnalytics` — fields: `url` (FK), `clicked_at`, `browser`, `device_type`, `referrer`.
+- Serializer:
+  - `shortener.serializers.URLSerializer` — validates `long_url` and provides `short_url` in responses.
+- Views:
+  - `shortener.views.URLCreateAPIView` — API endpoint creating `URL` instances.
+  - `shortener.views.URLRedirectView` — looks up `URL`, logs `ClickAnalytics`, and redirects.
+  - `analytics.views.URLAnalyticsAPIView` — returns aggregated analytics JSON.
+  - `analytics.views.AnalyticsDashboardView` / `shortener.views.AnalyticsReportView` — render HTML dashboards.
 
-- Method: GET
-- Endpoint: /<short_code>/
+Development notes
 
-### Get analytics for a short URL
+- Swagger UI assets are available in development when `DEBUG=True`. The OpenAPI config is in `url_shortener/urls.py` (edit `openapi.Info` there to change title/description/contact).
+- Admin can be used to manually inspect or delete analytics data. The public demo deliberately does not expose a global "clear analytics" button.
 
-- Method: GET
-- Endpoint: /analytics/urls/<short_code>/
+Example curl
+```bash
+# create a short url
+curl -X POST http://127.0.0.1:8000/shortener/create_urls/ \
+  -H 'Content-Type: application/json' \
+  -d '{"long_url":"https://example.com"}'
 
+# hit the short URL (redirect)
+curl -v http://127.0.0.1:8000/abc123/
 
-## Example Usage
+# get analytics
+curl http://127.0.0.1:8000/analytics/urls/abc123/
+```
 
-1. Create a URL:
-   ```bash
-   curl -X POST http://127.0.0.1:8000/shortener/create_urls/ \
-     -H "Content-Type: application/json" \
-     -d '{"long_url": "https://example.com"}'
-   ```
-2. Use the returned short URL to redirect to the original destination.
-3. View analytics using the analytics endpoint.
-
-git add.
-git commit -m "my first commit"
-git 
 

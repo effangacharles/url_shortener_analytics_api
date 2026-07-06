@@ -7,6 +7,34 @@ from .models import URL
 from analytics.models import ClickAnalytics
 
 class URLShortenerTests(APITestCase):
+
+    def test_home_page_renders(self):
+        """
+        Ensures the landing page is available to visitors.
+        """
+        response = self.client.get(reverse('home'))
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertContains(response, 'URL Shortener')
+        self.assertContains(response, 'Paste your long URL')
+
+    def test_analytics_report_page_renders(self):
+        """
+        Ensures the full analytics report page is accessible.
+        """
+        response = self.client.get(reverse('analytics_report'))
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertContains(response, 'Analytics Report')
+
+    def test_root_report_redirect(self):
+        """
+        Ensures the top-level report URL redirects to the app report page.
+        """
+        response = self.client.get('/analytics-report/')
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], '/shortener/analytics-report/')
     
     def setUp(self):
         """

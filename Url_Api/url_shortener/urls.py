@@ -16,19 +16,23 @@ Including another URLconf
 """
 # config/urls.py
 from django.contrib import admin
-from django.urls import path,include
-from shortener.views import URLRedirectView
+from django.urls import path, include
+from django.shortcuts import redirect
+from django.views.generic.base import RedirectView
+from shortener.views import URLRedirectView, HomePageView
 
 from rest_framework import permissions
+from django.conf import settings
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 
 schema_view = get_schema_view(
    openapi.Info(
-      title="E-commerce API",
-      default_version='v1',
-      description="API documentation for the E-commerce project",
+        title="URL Shortener & Analytics API",
+        default_version='v1',
+        description="API documentation for the URL Shortener and Analytics project",
       terms_of_service="https://www.google.com/policies/terms/",
       contact=openapi.Contact(email="contact@e-commerce.com")
    ),
@@ -37,8 +41,16 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
+    path('', HomePageView.as_view(), name='home'),
     path('admin/', admin.site.urls),
     path('shortener/', include('shortener.urls')),  
     path('analytics/', include('analytics.urls')),  
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    path('analytics-report/', RedirectView.as_view(url='/shortener/analytics-report/', permanent=False), name='analytics_report_root'),
     path('<str:short_code>/', URLRedirectView.as_view(), name='url_redirect'),
 ]
+
+# Serve static files in DEBUG (ensures drf-yasg assets are available when running runserver)
+if settings.DEBUG:
+    urlpatterns += staticfiles_urlpatterns()

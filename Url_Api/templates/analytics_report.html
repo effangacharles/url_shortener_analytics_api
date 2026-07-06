@@ -1,0 +1,83 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Report</title>
+    <link rel="stylesheet" href="{% static 'shortener/style.css' %}">
+</head>
+<body>
+    <main class="card wide-card">
+        <div class="page-header">
+            <div>
+                <span class="badge">📊 Full analytics report</span>
+                <h1>Analytics Report</h1>
+                <p>Review every tracked click from the demo project.</p>
+            </div>
+            <div class="demo-links">
+                <a href="/">Back to home</a>
+                <a href="/admin/">Open Admin Panel</a>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div>
+                <strong>{{ total_links }}</strong>
+                <span>Shortened links</span>
+            </div>
+            <div>
+                <strong>{{ total_clicks }}</strong>
+                <span>Total clicks</span>
+            </div>
+        </div>
+
+        <!-- Summary: clicks per unique long URL -->
+        <section class="summary-list card">
+            <h3>Clicks per link</h3>
+            <ul>
+                {% for item in link_counts %}
+                    <li>
+                        <a href="{{ item.url__long_url }}" target="_blank" rel="noopener noreferrer">{{ item.url__short_code }}</a>
+                        <span class="muted">— {{ item.url__long_url }}</span>
+                        <strong class="count">{{ item.clicks }}</strong>
+                    </li>
+                {% empty %}
+                    <li>No links tracked yet.</li>
+                {% endfor %}
+            </ul>
+        </section>
+
+        <div class="table-wrap">
+        <table class="activity-table">
+            <thead>
+                <tr>
+                    <th>Short code</th>
+                    <th>Long URL</th>
+                    <th>Browser</th>
+                    <th>Device type</th>
+                    <th>Referrer</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for click in all_clicks %}
+                    <tr>
+                        <td>{{ click.url.short_code }}</td>
+                        <td class="long-url"><a href="{{ click.url.long_url }}" target="_blank" rel="noopener noreferrer">{{ click.url.long_url }}</a></td>
+                        <td>{{ click.browser }}</td>
+                        <td>{{ click.device_type }}</td>
+                        <td>{{ click.referrer }}</td>
+                        <td>{{ click.clicked_at }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6">No analytics data yet.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+    </main>
+</body>
+</html>

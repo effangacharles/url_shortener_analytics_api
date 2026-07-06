@@ -1,10 +1,55 @@
 # shortener/views.py
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
+from django.contrib import messages
 from .models import URL
 from analytics.models import ClickAnalytics
+from django.db.models import Count
 from rest_framework.generics import CreateAPIView
 from .serializers import URLSerializer
+
+
+class HomePageView(View):
+    def get(self, request):
+        recent_clicks = ClickAnalytics.objects.select_related('url').order_by('-clicked_at')[:10]
+        total_links = URL.objects.count()
+        total_clicks = ClickAnalytics.objects.count()
+
+        context = {
+            'recent_clicks': recent_clicks,
+            'total_links': total_links,
+            'total_clicks': total_clicks,
+        }
+        return render(request, 'shortener.html', context)
+
+
+class AnalyticsReportView(View):
+    def get(self, request):
+        all_clicks = ClickAnalytics.objects.select_related('url').order_by('-clicked_at')
+        total_links = URL.objects.count()
+        total_clicks = all_clicks.count()
+
+        # Aggregate click counts per URL for the report summary
+        link_counts = (
+            ClickAnalytics.objects
+            .values('url__id', 'url__short_code', 'url__long_url')
+            .annotate(clicks=Count('id'))
+            .order_by('-clicks')
+        )
+
+        context = {
+            'all_clicks': all_clicks,
+            'total_links': total_links,
+            'total_clicks': total_clicks,
+            'link_counts': link_counts,
+        }
+        return render(request, 'analytics_report.html', context)
+
+    def post(self, request):
+        ClickAnalytics.objects.all().delete()
+        messages.success(request, 'All analytics records have been cleared.')
+        return redirect('analytics_report')
+
 
 class URLRedirectView(View):
     def get(self, request, short_code):
@@ -12,7 +57,7 @@ class URLRedirectView(View):
         url_instance = get_object_or_404(URL, short_code=short_code)
         
         # 2. Parse User-Agent Header to extract basic browser and device info
-        user_agent = request.META.get('HTTP_USER_AGENT', '').lower()
+        user_agent = (request.META.get('HTTP_USER_AGENT') or '').lower()
         
         # Super minimal browser parsing
         if 'edg' in user_agent or 'edge' in user_agent:
@@ -56,9 +101,5 @@ class URLRedirectView(View):
         return redirect(url_instance.long_url)
     
 class URLCreateAPIView(CreateAPIView):
-    """
-    API endpoint that allows a user to POST a long URL 
-    to get back a structured shortened asset.
-    """
     queryset = URL.objects.all()
     serializer_class = URLSerializer

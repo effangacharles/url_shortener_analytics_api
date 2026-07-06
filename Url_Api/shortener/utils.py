@@ -3,12 +3,6 @@ import secrets
 import string
 
 def generate_short_code(length=6):
-    """
-    Generates a secure, random alphanumeric short code using Base62.
-    Using 'secrets' instead of 'random' ensures cryptographically 
-    secure tokens that are harder to predict.
-    """
-    # 0-9 + a-z + A-Z (Total 62 characters)
     characters = string.digits + string.ascii_lowercase + string.ascii_uppercase
     
     # Securely pick random characters and join them
