@@ -11,9 +11,9 @@
     <main class="card wide-card">
         <div class="page-header">
             <div>
-                <span class="badge">📊 Full analytics report</span>
+                <span class="badge">Full analytics report</span>
                 <h1>Analytics Report</h1>
-                <p>Review every tracked click from the demo project.</p>
+                p>Review every tracked click from the demo project.</p>
             </div>
             <div class="demo-links">
                 <a href="/">Back to home</a>
@@ -31,22 +31,6 @@
                 <span>Total clicks</span>
             </div>
         </div>
-
-        <!-- Summary: clicks per unique long URL -->
-        <section class="summary-list card">
-            <h3>Clicks per link</h3>
-            <ul>
-                {% for item in link_counts %}
-                    <li>
-                        <a href="{{ item.url__long_url }}" target="_blank" rel="noopener noreferrer">{{ item.url__short_code }}</a>
-                        <span class="muted">— {{ item.url__long_url }}</span>
-                        <strong class="count">{{ item.clicks }}</strong>
-                    </li>
-                {% empty %}
-                    <li>No links tracked yet.</li>
-                {% endfor %}
-            </ul>
-        </section>
 
         <div class="table-wrap">
         <table class="activity-table">
@@ -78,6 +62,23 @@
             </tbody>
         </table>
         </div>
+
+       
+        <section class="summary-list card">
+            <h3>Clicks per link</h3>
+            <ul>
+                {% for item in link_counts %}
+                    <li>
+                        <a href="{{ item.url__long_url }}" target="_blank" rel="noopener noreferrer">{{ item.url__short_code }}</a>
+                        <span class="muted">— {{ item.url__long_url }}</span>
+                        <strong class="count">{{ item.clicks }}</strong>
+                    </li>
+                {% empty %}
+                    <li>No links tracked yet.</li>
+                {% endfor %}
+            </ul>
+        </section>
+
     </main>
 </body>
-</html>
+</html>  

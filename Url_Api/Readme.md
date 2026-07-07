@@ -1,6 +1,6 @@
 # URL Shortener & Analytics
 
-Small Django project that provides a REST API for shortening URLs, a redirect endpoint, and click analytics tracking. Includes a lightweight demo UI and Swagger/OpenAPI docs for quick inspection.
+A Django project that provides a REST API for shortening URLs, a redirect endpoint, and click analytics tracking. It Includes a lightweight demo UI and Swagger/OpenAPI docs for quick inspection.
 
 ## Key Features
 
@@ -30,10 +30,10 @@ Open the demo at: http://127.0.0.1:8000/
 
 ## Routes / Endpoints
 
-- POST `/shortener/create_urls/` — Create a short URL (JSON input `{ "long_url": "https://..." }`).
-- GET `/<short_code>/` — Redirect to the original URL and record a click.
-- GET `/analytics/urls/<short_code>/` — Analytics JSON for a short code (total clicks, browser/device breakdown).
-- Demo pages: `/` (home), `/shortener/analytics-report/` (full report), `/analytics/` (analytics index).
+- POST `/shortener/create_urls/` — Create a short URL (HTML input `{ "long_url": "https://..." }`).
+- POST `/<short_code>/` — Redirect to the original URL and record a click.
+- GET `/analytics/urls/<short_code>/` — Analytics JSON for a short code (total clicks, browser/device types, timestamp and referer breakdown).
+- Demo pages:  (home: `/shortener/home/` for generating short links),  (full Analytics report `shortener/analytics-report/`), 
 - Swagger UI: `/swagger/` — OpenAPI interactive documentaion
 - Admin: `/admin/` — Django admin to inspect `URL` and `ClickAnalytics` records.
 
@@ -46,7 +46,7 @@ Request → Response Cycle (detailed)
 - On save, serializer returns JSON containing `short_code` and a `short_url` built from the request.
 
 2) Redirect (user clicks short URL)
-- Client: GET `/{short_code}/`.
+- Client: POST `/{short_code}/`.
 - `shortener.views.URLRedirectView` finds the `URL` object (404 if not found), parses headers (`User-Agent`, `Referer`) to extract `browser`, `device_type`, and `referrer`.
 - A `ClickAnalytics` record is created with this metadata and timestamp.
 - View responds with a redirect (HTTP 302) to the `long_url`.
@@ -56,7 +56,7 @@ Request → Response Cycle (detailed)
 
 4) Demo / Reports (HTML)
 - Views `AnalyticsDashboardView` and `AnalyticsReportView` prepare context for templates (`templates/analytics_dashboard.html`, `templates/analytics_report.html`).
-- The templates render aggregated `link_counts` (click totals per long URL), full click lists, and summary statistics. Static CSS/JS are in `static/`.
+- The templates render aggregated `link_counts` (click totals per long URL), full click lists, and summary statistics. Static Files (CSS/JS) are in `static/`.
 
 Models / Serializers / Views mapping
 
@@ -81,7 +81,7 @@ Example curl
 # create a short url
 curl -X POST http://127.0.0.1:8000/shortener/create_urls/ \
   -H 'Content-Type: application/json' \
-  -d '{"long_url":"https://example.com"}'
+  -d '{"long_url":"https://google.com"}'
 
 # hit the short URL (redirect)
 curl -v http://127.0.0.1:8000/abc123/

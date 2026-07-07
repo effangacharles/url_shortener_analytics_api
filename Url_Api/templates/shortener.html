@@ -24,52 +24,12 @@
 
         <div class="demo-links">
             <a href="/swagger/">Open API Docs</a>
-            <a href="/analytics/">View Analytics Demo</a>
+            <!-- <a href="/analytics/">View Analytics Demo</a> -->
             <a href="{% url 'analytics_report' %}">View Full Report</a>
             <a href="/admin/">Open Admin Panel</a>
         </div>
 
-        <section class="report-card">
-            <h2>Live Analytics Snapshot</h2>
-            <div class="stats-grid">
-                <div>
-                    <strong>{{ total_links }}</strong>
-                    <span>Shortened links</span>
-                </div>
-                <div>
-                    <strong>{{ total_clicks }}</strong>
-                    <span>Total clicks</span>
-                </div>
-            </div>
-
-            <h3>All analytics activity</h3>
-            <table class="activity-table">
-                <thead>
-                    <tr>
-                        <th>Short code</th>
-                        <th>Browser</th>
-                        <th>Device</th>
-                        <th>Referrer</th>
-                        <th>Time</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for click in recent_clicks %}
-                        <tr>
-                            <td>{{ click.url.short_code }}</td>
-                            <td>{{ click.browser }}</td>
-                            <td>{{ click.device_type }}</td>
-                            <td>{{ click.referrer }}</td>
-                            <td>{{ click.clicked_at }}</td>
-                        </tr>
-                    {% empty %}
-                        <tr>
-                            <td colspan="5">No analytics data yet.</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </section>
+       
     </main>
 
     <script src="{% static 'shortener/app.js' %}"></script>

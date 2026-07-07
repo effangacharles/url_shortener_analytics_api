@@ -8,12 +8,12 @@ from .models import ClickAnalytics
 
 
 class AnalyticsIndexView(APIView):
-    def get(self, request, *args, **kwargs):
+    def get(self, request):
         return render(request, 'analytics_index.html')
 
 
 class AnalyticsDashboardView(APIView):
-    def get(self, request, short_code, *args, **kwargs):
+    def get(self, request, short_code):
         url_instance = get_object_or_404(URL, short_code=short_code)
         clicks = ClickAnalytics.objects.filter(url=url_instance)
 
@@ -34,9 +34,7 @@ class AnalyticsDashboardView(APIView):
 
 
 class URLAnalyticsAPIView(APIView):
-    """
-    API endpoint that aggregates click logs and returns metrics.
-    """
+    '''API endpoint that aggregates click logs and returns metrics.'''
     def get(self, request, short_code, *args, **kwargs):
         # Find the URL or 404
         url_instance = get_object_or_404(URL, short_code=short_code)
@@ -61,6 +59,7 @@ class URLAnalyticsAPIView(APIView):
             "metrics": {
                 "browsers": browser_breakdown,
                 "devices": device_breakdown
-            }
+            },
+            
         }
         return Response(data, status=status.HTTP_200_OK)

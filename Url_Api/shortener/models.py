@@ -11,13 +11,13 @@ class URL(models.Model):
     short_code = models.CharField(
         max_length=10, 
         unique=True, 
-        blank=True,  # Blank=True allows Django forms/serializers to validate without requiring it manually
+        blank=True,  
         help_text="The unique Base62 short token."
     )
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ['-created_at']  # Keeps newest links on top
+        ordering = ['-created_at']  
 
     def __str__(self):
         return f"{self.short_code} -> {self.long_url[:40]}"
@@ -32,6 +32,3 @@ def auto_generate_short_code(sender, instance, *args, **kwargs):
     if not instance.short_code:
         instance.short_code = create_unique_slug(instance)
 
-'''
-username = charleseffanga
-passworld: effangacharles'''

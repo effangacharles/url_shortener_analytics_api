@@ -1,4 +1,6 @@
 # shortener/views.py
+from urllib import response
+
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 from django.contrib import messages
@@ -54,7 +56,12 @@ class AnalyticsReportView(View):
 class URLRedirectView(View):
     def get(self, request, short_code):
         # 1. Fetch the long URL using the short code, or return a 404 page if it doesn't exist
+        
         url_instance = get_object_or_404(URL, short_code=short_code)
+        
+        
+
+        
         
         # 2. Parse User-Agent Header to extract basic browser and device info
         user_agent = (request.META.get('HTTP_USER_AGENT') or '').lower()
